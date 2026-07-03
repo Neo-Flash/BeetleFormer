@@ -1,0 +1,40 @@
+# RNAi activity prediction — dsRNA sequence -> lethality + phenotype.
+run_name: rnai_transformer
+device: auto            # auto -> cuda/mps/cpu; override with cpu/cuda
+seed: 508
+
+data:
+  manifest: ./data/ibeetle_rnai/manifest.csv
+  data_dir: ./data/ibeetle_rnai
+  max_len: 640           # covers the 615 bp max dsRNA
+  val_fraction: 0.1      # gene-disjoint
+
+model:
+  arch: transformer      # transformer | cnn_bilstm
+  dim: 192
+  depth: 4
+  heads: 6
+  mlp_ratio: 4.0
+  dropout: 0.1
+  pool: mean             # mean | cls
+  conv_stem: true        # conv front-end (local k-mer motifs + downsample); recommended for long dsRNA
+  stem_kernel: 9         # conv kernel width
+  stem_layers: 2         # number of conv layers in the stem
+  stem_pool: 4           # downsample factor (640 -> ~160 tokens into the Transformer)
+
+train:
+  batch_size: 64
+  lr: 0.0003
+  weight_decay: 0.01
+  total_steps: 8000
+  warmup_steps: 400
+  pheno_weight: 1.0      # phenotype is a co-equal main task (was 0.5 auxiliary)
+  leth_loss: huber       # huber | mse
+  num_workers: 4
+  log_every: 100
+  eval_every: 500
+  ckpt_every: 2000
+
+paths:
+  ckpt_dir: ./checkpoint/rnai
+  out_dir: ./logs/rnai
