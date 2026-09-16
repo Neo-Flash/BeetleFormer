@@ -1,147 +1,113 @@
-"""Build a unified RNAi manifest keyed by dsRNA (iB id).
+"""Rebuild labels, background fragments, their provenance, and the frozen split.
 
-Joins the four iBeetle download files into one table, one row per dsRNA:
-
-    iB_sequence.csv      iB -> dsRNA sequence (+ primers)        [input X]
-    iBeetle_lethality.csv iB -> dali11/dali22/dapi11 (%)         [main task y]
-    phenotypes.ndjson    gene -> phenotypes, each tagged with    [aux task y]
-                         its dsRNA.name (iB) and iBeetleTopic
-    iB_TC.csv            iB -> TC gene id                        [grouping only]
-
-Lethality has missing entries (dali22 ~69% missing); we keep them as empty so
-the dataset/loss can mask them. Phenotype topics become a fixed 15-class
-multi-hot vector (aggregated per dsRNA across all its phenotype annotations).
-
-Output: data/ibeetle_rnai/manifest.csv with columns
-    iB, tc, seq, dali11, dali22, dapi11, phase, <one column per topic>
-
-Usage:
-    python scripts/prepare_data.py --data-dir data/ibeetle_rnai
+The positive-length distribution is used for proposal sampling. Rejection of
+short transcripts means the accepted negative lengths are NOT exactly matched.
+The surrogate-negative label is a benchmark convention, not measured inactivity.
 """
-import os
-import csv
-import json
-import argparse
-from collections import defaultdict
+import argparse, csv, hashlib, json, random
+import numpy as np
+import pandas as pd
+import torch
+from sklearn.model_selection import GroupShuffleSplit
+from common import ROOT, RESULTS, CONFIG
+from data.rnai_dataset import encode_seq
+from data.features import compute_features
+from data.external_records import load_original_external
+from data.sequence_isolation import internal_components, external_matches, assert_external_isolation
 
 
-def read_sequences(path):
-    """iB -> seq. Header: #iB,seq,leftPrimer,rightPrimer"""
-    seqs = {}
-    with open(path) as f:
-        r = csv.reader(f)
-        next(r)  # header
-        for row in r:
-            if len(row) >= 2 and row[1]:
-                seqs[row[0]] = row[1].strip().upper()
-    return seqs
+def fasta(path):
+    name, parts = None, []
+    for line in path.read_text().splitlines():
+        if line.startswith('>'):
+            if name: yield name, ''.join(parts)
+            name, parts = line[1:], []
+        else: parts.append(line.strip())
+    if name: yield name, ''.join(parts)
 
 
-def read_lethality(path):
-    """iB -> {dali11,dali22,dapi11,phase}. Semicolon-delimited, UTF-8-BOM."""
-    leth = {}
-    with open(path, encoding="utf-8-sig") as f:
-        r = csv.DictReader(f, delimiter=";")
-        for row in r:
-            leth[row["iB"]] = {
-                "dali11": row.get("dali11", ""),
-                "dali22": row.get("dali22", ""),
-                "dapi11": row.get("dapi11", ""),
-                "phase": row.get("phase", ""),
-            }
-    return leth
-
-
-def read_ib_tc(path):
-    """iB -> TC gene id. Header: #iB,TC"""
-    m = {}
-    with open(path) as f:
-        next(f)
-        for line in f:
-            parts = line.strip().split(",")
-            if len(parts) == 2:
-                m[parts[0]] = parts[1]
-    return m
-
-
-def read_phenotypes(path):
-    """iB -> set of iBeetleTopic. The ndjson is gene-level; each phenotype
-    carries its dsRNA.name (iB) so we can attribute topics to the exact dsRNA."""
-    ib_topics = defaultdict(set)
-    with open(path) as f:
-        for line in f:
-            try:
-                rec = json.loads(line)
-            except json.JSONDecodeError:
-                continue
-            for p in rec.get("phenotypes", []):
-                ds = p.get("dsRNA")
-                ib = ds.get("name") if isinstance(ds, dict) else ds
-                topic = p.get("iBeetleTopic")
-                if ib and topic:
-                    ib_topics[ib].add(topic)
-    return ib_topics
+def gene_of(header):
+    for token in header.replace('|', ' ').split():
+        if token.startswith('TC'): return token.split('-')[0]
+    return header.split()[0]
 
 
 def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--data-dir", default="data/ibeetle_rnai")
-    ap.add_argument("--out", default=None)
-    args = ap.parse_args()
-    d = args.data_dir
-    out_path = args.out or os.path.join(d, "manifest.csv")
+    ap = argparse.ArgumentParser(); ap.add_argument('--rebuild-cache', action='store_true'); args = ap.parse_args()
+    rawdir = ROOT / 'data/raw/ibeetle'
+    raw = list(csv.DictReader((rawdir/'manifest.csv').open()))
+    topics = (rawdir/'topics.txt').read_text().splitlines()
+    positives = [r for r in raw if (r['dali11'] not in ('','NA') and float(r['dali11'])>20) or any(r[t]=='1' for t in topics)]
+    targets = {r['tc'] for r in positives if r['tc']}; seqs = {r['seq'].upper() for r in positives}
+    lengths = [len(r['seq']) for r in positives]
+    transcripts = [(h,gene_of(h),s.upper().replace('U','T')) for h,s in fasta(rawdir/'OGS3_mRNA.fasta')
+                   if gene_of(h) not in targets and len(s)>=min(lengths)]
+    rng = random.Random(508); negative = []; seen = set(); tries = 0
+    while len(negative) < len(positives):
+        tries += 1
+        if tries > len(positives)*50: raise RuntimeError('Insufficient background fragments')
+        length = rng.choice(lengths); header,gene,seq = transcripts[rng.randrange(len(transcripts))]
+        if len(seq)<length: continue
+        start = rng.randrange(len(seq)-length+1); frag = seq[start:start+length]
+        if 'N' in frag or frag in seqs or frag in seen: continue
+        seen.add(frag)
+        negative.append(dict(id=f'mRNA_{len(negative):06d}', source_gene=gene, transcript=header,
+                             start0=start, end0=start+length, seq=frag))
+    prov = pd.DataFrame(negative)
+    expected = pd.read_csv(ROOT/'provenance/negative_source_provenance.csv')
+    pd.testing.assert_frame_equal(prov, expected)
+    base = pd.DataFrame([dict(id=r['iB'],seq=r['seq'].upper(),label=1,src='dsRNA',gene=r['tc']) for r in positives]
+                        + [dict(id=r['id'],seq=r['seq'],label=0,src='mRNA',gene=f'_negmRNA_{i:06d}') for i,r in enumerate(negative)])
+    pd.testing.assert_frame_equal(base, pd.read_csv(rawdir/'manifest_binary.csv').fillna(''))
+    source = prov.set_index('id').source_gene
+    base['source_gene'] = [source.loc[r.id] if r.label==0 else (r.gene or 'unknown_'+r.id) for r in base.itertuples()]
+    trans = str.maketrans('ACGT','TGCA')
+    # Freeze external identities before any split or model fit. Outcomes are not
+    # consulted in grouping, quarantine or model/checkpoint selection.
+    external = load_original_external(ROOT/'data/raw')
+    external.to_csv(ROOT/'provenance/original_external_records.csv',index=False)
+    identities = external[['id','gene','sequence']].copy()
+    lock = ROOT/'provenance/external_identity_lock.csv'
+    if lock.exists():pd.testing.assert_frame_equal(identities,pd.read_csv(lock))
+    else:identities.to_csv(lock,index=False)
+    base['group'],links,ncomparisons = internal_components(base)
+    hits = external_matches(base,identities)
+    # Keep the internal assignment fixed across the two external protocols.
+    groups=base.group.to_numpy();labels=base.label.to_numpy()
+    trainval,test=next(GroupShuffleSplit(n_splits=1,test_size=CONFIG['split']['test_group_fraction'],random_state=CONFIG['seed']).split(base,labels,groups))
+    a,b=next(GroupShuffleSplit(n_splits=1,test_size=CONFIG['split']['validation_remaining_group_fraction'],random_state=CONFIG['split']['second_seed']).split(base.iloc[trainval],labels[trainval],groups[trainval]))
+    base['partition']='';base.loc[trainval[a],'partition']='train';base.loc[trainval[b],'partition']='validation';base.loc[test,'partition']='test'
+    base.to_csv(ROOT/'provenance/initial_group_assignment.csv',index=False)
+    overlap_ids=set(hits.internal_id)
+    for protocol,run in [('sequence',ROOT),('gene',ROOT/'strict_gene')]:
+        results=run/'results';data=run/'data'
+        results.mkdir(parents=True,exist_ok=True);data.mkdir(parents=True,exist_ok=True)
+        (run/'checkpoints').mkdir(exist_ok=True);(run/'logs').mkdir(exist_ok=True)
+        remove=base.id.isin(overlap_ids)
+        if protocol=='gene':remove=remove|base.source_gene.isin(identities.gene)
+        excluded=base[remove].copy();frame=base[~remove].reset_index(drop=True)
+        links.to_csv(results/'sequence_component_links.csv',index=False)
+        hits.to_csv(results/'external_quarantine_matches.csv',index=False)
+        excluded.to_csv(results/'external_quarantine_records.csv',index=False)
+        isolation=assert_external_isolation(frame,identities,require_genes=protocol=='gene')
+        (results/'external_isolation_checks.json').write_text(json.dumps(isolation,indent=2))
+        path=results/'source_gene_split.csv'
+        if path.exists():pd.testing.assert_frame_equal(frame,pd.read_csv(path).fillna(''))
+        else:frame.to_csv(path,index=False)
+        y=frame.label.to_numpy()
+        if args.rebuild_cache or not (data/'inputs.npz').exists():
+            encoded=[encode_seq(s,640,1) for s in frame.seq]
+            features=np.stack([compute_features(s,640) for s in frame.seq])
+            np.savez_compressed(data/'inputs.npz',ids=torch.stack([x[0] for x in encoded]).numpy(),attn=torch.stack([x[1] for x in encoded]).numpy(),feat=features,y=y)
+            np.save(data/'features_rc.npy',np.stack([compute_features(s.translate(trans)[::-1],640) for s in frame.seq]))
+        checks=dict(protocol=protocol,sequences=len(frame),positive=int(y.sum()),negative_sources=int(frame.loc[frame.label.eq(0),'source_gene'].nunique()),eligible_transcripts=len(transcripts),negative_proposals=tries,
+            split_sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
+            counts={part:dict(n=len(g),positive=int(g.label.sum()),source_genes=g.source_gene.nunique()) for part,g in frame.groupby('partition')},
+            exact_reconstruction=True,initial_sequences=len(base),initial_positive=int(base.label.sum()),
+            external_excluded_sequences=len(excluded),external_excluded_positive=int(excluded.label.sum()),external_excluded_source_genes=int(excluded.source_gene.nunique()),
+            external_identity_sha256=hashlib.sha256(lock.read_bytes()).hexdigest(),internal_cross_gene_sequence_links=len(links),internal_candidate_comparisons=ncomparisons,
+            dataset_sha256=hashlib.sha256((data/'inputs.npz').read_bytes()).hexdigest())
+        (results/'data_checks.json').write_text(json.dumps(checks,indent=2));print(json.dumps(checks,indent=2),flush=True)
 
-    seqs = read_sequences(os.path.join(d, "iB_sequence.csv"))
-    leth = read_lethality(os.path.join(d, "iBeetle_lethality.csv"))
-    ib_tc = read_ib_tc(os.path.join(d, "iB_TC.csv"))
-    ib_topics = read_phenotypes(os.path.join(d, "phenotypes.ndjson"))
-    print(f"[prep] sequences={len(seqs)} lethality={len(leth)} "
-          f"ib_tc={len(ib_tc)} dsRNA_with_phenotype={len(ib_topics)}")
 
-    # fixed topic vocabulary (sorted for determinism)
-    all_topics = sorted({t for ts in ib_topics.values() for t in ts})
-    print(f"[prep] phenotype topics ({len(all_topics)}): {all_topics}")
-
-    # a dsRNA is usable if it has BOTH a sequence and at least one lethality value
-    leth_cols = ["dali11", "dali22", "dapi11"]
-    rows = []
-    n_no_seq = n_no_leth = 0
-    for ib, seq in seqs.items():
-        l = leth.get(ib)
-        if l is None or all(l[c] in ("", "NA") for c in leth_cols):
-            n_no_leth += 1
-            continue
-        topics = ib_topics.get(ib, set())
-        row = {
-            "iB": ib,
-            "tc": ib_tc.get(ib, ""),
-            "seq": seq,
-            "dali11": l["dali11"], "dali22": l["dali22"], "dapi11": l["dapi11"],
-            "phase": l["phase"],
-        }
-        for t in all_topics:
-            row[t] = 1 if t in topics else 0
-        rows.append(row)
-
-    fields = ["iB", "tc", "seq"] + leth_cols + ["phase"] + all_topics
-    with open(out_path, "w", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=fields)
-        w.writeheader()
-        w.writerows(rows)
-
-    # coverage report
-    n_with_pheno = sum(1 for r in rows if any(r[t] for t in all_topics))
-    n_with_gene = sum(1 for r in rows if r["tc"])
-    print(f"[prep] wrote {out_path}: {len(rows)} dsRNA rows "
-          f"({n_no_leth} dropped for no lethality)")
-    print(f"[prep]   with gene id: {n_with_gene} | with >=1 phenotype: {n_with_pheno}")
-    for c in leth_cols:
-        n = sum(1 for r in rows if r[c] not in ("", "NA"))
-        print(f"[prep]   {c} observed: {n}/{len(rows)} ({100*n//len(rows)}%)")
-    # also write the topic vocab for the dataset to load
-    with open(os.path.join(d, "topics.txt"), "w") as f:
-        f.write("\n".join(all_topics))
-
-
-if __name__ == "__main__":
-    main()
+if __name__=='__main__':main()

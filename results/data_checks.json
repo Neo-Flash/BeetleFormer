@@ -1,0 +1,36 @@
+{
+  "protocol": "sequence",
+  "sequences": 29646,
+  "positive": 14821,
+  "negative_sources": 2051,
+  "eligible_transcripts": 2277,
+  "negative_proposals": 19132,
+  "split_sha256": "e83a9012367a4694bbb09605249b5f8617dd7a8d5bf7e39e05efcd6cf7196df0",
+  "counts": {
+    "test": {
+      "n": 6083,
+      "positive": 2970,
+      "source_genes": 3307
+    },
+    "train": {
+      "n": 17957,
+      "positive": 8894,
+      "source_genes": 9855
+    },
+    "validation": {
+      "n": 5606,
+      "positive": 2957,
+      "source_genes": 3247
+    }
+  },
+  "exact_reconstruction": true,
+  "initial_sequences": 29650,
+  "initial_positive": 14825,
+  "external_excluded_sequences": 4,
+  "external_excluded_positive": 4,
+  "external_excluded_source_genes": 4,
+  "external_identity_sha256": "fbdd27af274ce27a74007f6421cc04e5223c5d126f6a3601f38befc9a1ea7a1b",
+  "internal_cross_gene_sequence_links": 865,
+  "internal_candidate_comparisons": 2687,
+  "dataset_sha256": "524588abf3139fecdf0f0543cb5bd282de1bc9bd4d691d4474da751723f60423"
+}

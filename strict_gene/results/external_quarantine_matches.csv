@@ -1,0 +1,5 @@
+internal_id,source_gene,external_id,external_gene,reason,external_20mer_fraction
+iB_01326,TC008246,original_external_39,TC008246,full_sequence_containment,1.0
+iB_07228,TC008318,original_external_21,TC008318,external_20mer_fraction_at_least_0.5,0.6169844020797227
+iB_12959,TC015342,original_external_23,TC015342,external_20mer_fraction_at_least_0.5,0.6425339366515838
+iB_16829,TC002434,original_external_33,TC002434,full_sequence_containment,0.7177700348432056

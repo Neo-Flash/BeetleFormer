@@ -1,0 +1,6 @@
+{
+  "strand_symmetric": "beetleformer",
+  "transformer": "single_scale_transformer",
+  "cnn_faithful": "cnn_bilstm",
+  "masked_multiscale": "without_strand_symmetry"
+}

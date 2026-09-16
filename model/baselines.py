@@ -57,20 +57,15 @@ class CNNBiLSTM(nn.Module):
         }
 
 
-class CNNBiLSTMFaithful(nn.Module):
-    """Faithful re-implementation of the dsRNAPredictor network (Cheng et al.),
-    with architecture and hyperparameters matched as closely as PyTorch allows.
+class AdaptedCNNBiLSTM(nn.Module):
+    """Adapted comparator inspired by dsRNAPredictor, not its released model.
 
-    Original (Keras): Conv1D(64, k=3, valid, relu) -> MaxPool(5) -> BatchNorm
-    -> Dropout(0.2) -> BiLSTM(50, return_sequences) -> BatchNorm -> Dropout(0.5)
-    -> SeqSelfAttention(additive, softmax) -> Flatten -> Dense(16, sigmoid)
-    -> Dense(1, sigmoid). Trained with Adam lr=1e-4, batch=32.
-
-    The only intentional difference from the original is the input: we use our
-    learnable single-nucleotide embedding instead of summed dna2vec k-mer vectors
-    (the original pre-trained dna2vec weights are not distributed), so that the
-    baseline uses the same input representation as dsRNATransformer and the
-    comparison isolates the network architecture.
+    Uses a trainable nucleotide embedding, additive attention pooling, and
+    30 extra descriptors. These differ from summed dna2vec features and the
+    published pairwise-attention/flattening path. The shared training schedule
+    is defined in config/experiment.json. The unused phenotype head is retained
+    to preserve checkpoint keys and initialization order; only the scalar
+    classification head is optimized by the binary objective.
     """
 
     def __init__(self, dim=100, num_lethality=len(LETH_COLS), num_topics=15,
@@ -86,7 +81,7 @@ class CNNBiLSTMFaithful(nn.Module):
         self.lstm = nn.LSTM(64, lstm_hidden, batch_first=True, bidirectional=True)
         self.bn2 = nn.BatchNorm1d(2 * lstm_hidden)
         self.drop2 = nn.Dropout(0.5)
-        # additive self-attention, matching keras SeqSelfAttention(softmax)
+        # Additive attention pooling over recurrent outputs (an adaptation).
         self.attn_W = nn.Linear(2 * lstm_hidden, attn_dim)
         self.attn_v = nn.Linear(attn_dim, 1)
         self.dense1 = nn.Linear(2 * lstm_hidden, dense_hidden)

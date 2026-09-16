@@ -1,0 +1,8 @@
+{
+  "source_original_path": "/Users/flash/Desktop/AI+RNAi原始版本/release_data/BeetleFormer_external_test.csv",
+  "sha256": "6860203d257c9815a111628e4bfc944f8951076d69545d4e4af54a6a56dfc30a",
+  "records": 40,
+  "positive": 20,
+  "background": 20,
+  "policy": "Preserve all original sequences and binary labels; original scores and mixed biological readouts are archival metadata and not inputs to model fitting or selection."
+}

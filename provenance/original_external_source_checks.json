@@ -1,0 +1,207 @@
+{
+  "positive_records_checked": 20,
+  "sequences_or_labels_changed": false,
+  "source_file_sha256": {
+    "12915_2025_2219_MOESM1_ESM.xlsx": "4b2ca3f087416bcf9acd9583c73b9816c3acb6a7f81c30091ad6d0eb29506ef9",
+    "41598_2018_20416_MOESM1_ESM.xlsx": "ac0e25c59e61b0d246a476502bff3f078c4bc18ad03785403a8d15d0ca54f66a",
+    "42003_2024_6212_MOESM1_ESM.docx": "acdaa17ce8510c91314b6b107bcd981936f3fe898b077e7b00a5cefd76be713c",
+    "42003_2024_6212_MOESM4_ESM.xlsx": "9d0dec654c685a9afd2adb0fc06534f4c7cfd92c40201df18938f5f431c3f111"
+  },
+  "records": [
+    {
+      "id": "original_external_00",
+      "source": "Gaddelapati2024",
+      "source_gene": "TC008129",
+      "sequence_sha256": "2de1e91cedf89f2413cdad457a3f66cbd71044cfa439f475848e103e02b9909d",
+      "published_gene_symbol": "NAA30",
+      "source_table": "Supplementary Tables 1–3 and 5",
+      "published_forward_primer": "TAATACGACTCACTATAGGGCGAAGACGAGGGCATTAACA",
+      "published_reverse_primer": "TAATACGACTCACTATAGGGACCGGTAGGTGTAGATGGAATA",
+      "check": "Original genomic fragment boundaries follow the archived T7/leading-G trimming rule; target identity matches the source gene table."
+    },
+    {
+      "id": "original_external_01",
+      "source": "Cedden2025",
+      "source_gene": "TC006679",
+      "sequence_sha256": "feae2a3273f068521af36ec980f71612f371cd5e91a12d27f7ce567457e66cfc",
+      "source_table": "Additional file 1, Primer list 2",
+      "check": "Full original sequence exactly matches the published amplicon sequence."
+    },
+    {
+      "id": "original_external_02",
+      "source": "Cedden2025",
+      "source_gene": "TC006375",
+      "sequence_sha256": "3a7cfcfeff35dea82c3c20550223951d03136f6fbfb7366a34a9476b46a8b7d5",
+      "source_table": "Additional file 1, Primer list 2",
+      "check": "Full original sequence exactly matches the published amplicon sequence."
+    },
+    {
+      "id": "original_external_03",
+      "source": "Cedden2025",
+      "source_gene": "TC008263",
+      "sequence_sha256": "b8c4fdf8872ad60e766704e368f2370d5c0f14789570b8ba61767edfe49c1bfa",
+      "source_table": "Additional file 1, Primer list 2",
+      "check": "Full original sequence exactly matches the published amplicon sequence."
+    },
+    {
+      "id": "original_external_04",
+      "source": "Knorr2018",
+      "source_gene": "TC030579",
+      "sequence_sha256": "3c969f37fe268c0d9a68488cc473928dc7174bd94c770dfb78dcd56b302674de",
+      "source_table": "Supplementary Table 1",
+      "check": "Full original sequence and Arp1 gene identifier match the published table."
+    },
+    {
+      "id": "original_external_05",
+      "source": "Cedden2025",
+      "source_gene": "TC008058",
+      "sequence_sha256": "2ba975ac17eea6b381cbb4d7e2d5bf2110fe18eabfc79e5a047689d9ccdaba98",
+      "source_table": "Additional file 1, Primer list 2",
+      "check": "Full original sequence exactly matches the published amplicon sequence."
+    },
+    {
+      "id": "original_external_06",
+      "source": "Gaddelapati2024",
+      "source_gene": "TC015921",
+      "sequence_sha256": "b417186a2421ae13c1eb9fba2ebafd4e66f4e669cb9611c13d529952c11745b7",
+      "published_gene_symbol": "NAA40",
+      "source_table": "Supplementary Tables 1–3 and 5",
+      "published_forward_primer": "TAATACGACTCACTATAGGGAGTTGGGATAGGCACCATAAC",
+      "published_reverse_primer": "TAATACGACTCACTATAGGGCTAAATACCGGAAACGGCTCTAA",
+      "check": "Original genomic fragment boundaries follow the archived T7/leading-G trimming rule; target identity matches the source gene table."
+    },
+    {
+      "id": "original_external_07",
+      "source": "Cedden2025",
+      "source_gene": "TC006375",
+      "sequence_sha256": "dc0f5595061f21be1868bb597e8ae980509de8da7f19b58db9bb959fa0104818",
+      "source_table": "Additional file 1, Primer list 2",
+      "check": "Full original sequence exactly matches the published amplicon sequence."
+    },
+    {
+      "id": "original_external_08",
+      "source": "Cedden2025",
+      "source_gene": "TC006679",
+      "sequence_sha256": "62ec0821b39f54074931544fc0f33ced2635300fb97fe865458b4769cf678241",
+      "source_table": "Additional file 1, Primer list 2",
+      "check": "Full original sequence exactly matches the published amplicon sequence."
+    },
+    {
+      "id": "original_external_09",
+      "source": "Cedden2025",
+      "source_gene": "TC008263",
+      "sequence_sha256": "c953c26625c2873f7e081559a9be26a459d920e51a810aff9020e4c97c07aabe",
+      "source_table": "Additional file 1, Primer list 2",
+      "check": "Full original sequence exactly matches the published amplicon sequence."
+    },
+    {
+      "id": "original_external_10",
+      "source": "AbdElHalim2016",
+      "source_gene": "TC031485",
+      "sequence_sha256": "9108f05d2e971a44100ffe7a628c2540872a4b55b6041cf56113c32b4a1a8669",
+      "source_table": "Table 1; https://pmc.ncbi.nlm.nih.gov/articles/PMC4944135/",
+      "published_forward_primer": "AAGGCAAGGACATATTCCGA",
+      "published_reverse_primer": "TCAAACGTGTAGATGCCAGTG",
+      "check": "Original 217-base fragment matches both published PCR primer boundaries."
+    },
+    {
+      "id": "original_external_11",
+      "source": "Gaddelapati2024",
+      "source_gene": "TC008190",
+      "sequence_sha256": "05f8fc52d348c26bbf4de610a9fe4bd26e3562875493a552e805a418d5d09ee5",
+      "published_gene_symbol": "NAA16",
+      "source_table": "Supplementary Tables 1–3 and 5",
+      "published_forward_primer": "TAATACGACTCACTATAGGAGCTTCCTGGATCGGTTATG",
+      "published_reverse_primer": "TAATACGACTCACTATAGCAGCGACCTCCTCATGTATTT",
+      "check": "Original genomic fragment boundaries follow the archived T7/leading-G trimming rule; target identity matches the source gene table."
+    },
+    {
+      "id": "original_external_12",
+      "source": "Gaddelapati2024",
+      "source_gene": "TC007435",
+      "sequence_sha256": "8e6aa1a7b96fdf3464d265ff90c4f2d4bba2e9ab99e321dc80b0a469fdb694a0",
+      "published_gene_symbol": "NAT10",
+      "source_table": "Supplementary Tables 1–3 and 5",
+      "published_forward_primer": "TAATACGACTCACTATAGGGAGTCCGAGTCCGGAGAATTTA",
+      "published_reverse_primer": "TAATACGACTCACTATAGGGGTGCCCTCGTAACCATTGATAG",
+      "check": "Original genomic fragment boundaries follow the archived T7/leading-G trimming rule; target identity matches the source gene table."
+    },
+    {
+      "id": "original_external_13",
+      "source": "Gaddelapati2024",
+      "source_gene": "TC008518",
+      "sequence_sha256": "ac7ae03bb0d1d827db077dfdade2a1ec1bed1b9c1adce30647ee465507f5f969",
+      "published_gene_symbol": "MCM3AP",
+      "source_table": "Supplementary Tables 1–3 and 5",
+      "published_forward_primer": "TAATACGACTCACTATAGCATCACTTCCCGTCTCATACTT",
+      "published_reverse_primer": "TAATACGACTCACTATAGGTGACGCTAGTTGGGTTATCT",
+      "check": "Original genomic fragment boundaries follow the archived T7/leading-G trimming rule; target identity matches the source gene table."
+    },
+    {
+      "id": "original_external_14",
+      "source": "Gaddelapati2024",
+      "source_gene": "TC011945",
+      "sequence_sha256": "f6e9e16e3879cac58843f38d759f8b0a7deb926ce8543c859516562892b25b66",
+      "published_gene_symbol": "KAT7",
+      "source_table": "Supplementary Tables 1–3 and 5",
+      "published_forward_primer": "TAATACGACTCACTATAGGGGGAAGGAACCACCGAAGAAG",
+      "published_reverse_primer": "TAATACGACTCACTATAGGGCTGACCACGGCCTTAGATTTAG",
+      "check": "Original genomic fragment boundaries follow the archived T7/leading-G trimming rule; target identity matches the source gene table."
+    },
+    {
+      "id": "original_external_15",
+      "source": "Gaddelapati2024",
+      "source_gene": "TC002507",
+      "sequence_sha256": "c7789dc80802d65c34273a02228b9b9c83b76e37fd82154cc0be73cf53146e6b",
+      "published_gene_symbol": "TAF1",
+      "source_table": "Supplementary Tables 1–3 and 5",
+      "published_forward_primer": "TAATACGACTCACTATAGCAATGCTGCCGTCCAAATAC",
+      "published_reverse_primer": "TAATACGACTCACTATAGTTGGGTGACCATGAGGAAAG",
+      "check": "Original genomic fragment boundaries follow the archived T7/leading-G trimming rule; target identity matches the source gene table."
+    },
+    {
+      "id": "original_external_16",
+      "source": "Gaddelapati2024",
+      "source_gene": "TC002077",
+      "sequence_sha256": "2e8e6ea9633a5c6e967c1bba183421ba0301ae52a3686ca7a99eac5ffacd06f2",
+      "published_gene_symbol": "HAT1",
+      "source_table": "Supplementary Tables 1–3 and 5",
+      "published_forward_primer": "TAATACGACTCACTATAGGACATGGCCCACCAGATATT",
+      "published_reverse_primer": "TAATACGACTCACTATAGGTCCTCCAGGTCTATGAAGTTG",
+      "check": "Original genomic fragment boundaries follow the archived T7/leading-G trimming rule; target identity matches the source gene table."
+    },
+    {
+      "id": "original_external_17",
+      "source": "Gaddelapati2024",
+      "source_gene": "TC009267",
+      "sequence_sha256": "46ae38f6206abb7b757552280ee6574403af968e99af3a65a703c727393ca4a1",
+      "published_gene_symbol": "KAT14",
+      "source_table": "Supplementary Tables 1–3 and 5",
+      "published_forward_primer": "TAATACGACTCACTATAGCGAGTCGTTTGTTAGGGAGAAA",
+      "published_reverse_primer": "TAATACGACTCACTATAGCGTTCGTGAGAGCAGCATATAA",
+      "check": "Original genomic fragment boundaries follow the archived T7/leading-G trimming rule; target identity matches the source gene table."
+    },
+    {
+      "id": "original_external_18",
+      "source": "Gaddelapati2024",
+      "source_gene": "TC014774",
+      "sequence_sha256": "ce408ecfcaaec54b81ea68ff743d4e2bb1c7c7fc6ac5b8d36d9736618553a682",
+      "published_gene_symbol": "KAT2A",
+      "source_table": "Supplementary Tables 1–3 and 5",
+      "published_forward_primer": "TAATACGACTCACTATAGGGCCAATCGGCGGTATTTGTTTC",
+      "published_reverse_primer": "TAATACGACTCACTATAGGGGACTGAAGTGAACTCGGTGTAG",
+      "check": "Original genomic fragment boundaries follow the archived T7/leading-G trimming rule; target identity matches the source gene table."
+    },
+    {
+      "id": "original_external_19",
+      "source": "Gaddelapati2024",
+      "source_gene": "TC015420",
+      "sequence_sha256": "67518e577e178a63b6b737487bc6f70d71844e806a041c4675e4d98ab67c226c",
+      "published_gene_symbol": "NAA25",
+      "source_table": "Supplementary Tables 1–3 and 5",
+      "published_forward_primer": "TAATACGACTCACTATAGGAGAGTGTAGACAGGTGGGATA",
+      "published_reverse_primer": "TAATACGACTCACTATAGGACAATTGGAGGGCACATAGA",
+      "check": "Original genomic fragment boundaries follow the archived T7/leading-G trimming rule; target identity matches the source gene table."
+    }
+  ]
+}

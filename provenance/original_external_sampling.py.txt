@@ -1,0 +1,131 @@
+"""Final: 20 effective dsRNA (positives) vs 20 length-matched mRNA fragments
+(negatives, from OGS3, excluding any overlap with the training set).
+
+Positives : the 20 'effective' rows (quantitative >=50% + qualitative-effective)
+            from ALL_clean_external_dsRNA_marked.csv -- all sequence-level
+            train-clean, from independent papers.
+Negatives : 20 mRNA fragments sampled from OGS3 transcripts, length-matched to
+            the positives, excluding exact/high-overlap with training negatives.
+
+Reports per-class accuracy (dsRNA called effective / mRNA called ineffective),
+overall accuracy, and AUC.
+"""
+import os, sys, csv, random, math
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, ROOT)
+import torch
+from data.rnai_dataset import encode_seq
+from data.features import compute_features, FEATURE_DIM
+from model.seq_transformer import dsRNATransformer
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+DATA = os.path.join(ROOT, "data", "ibeetle_rnai")
+CKPT = os.path.join(ROOT, "checkpoint", "2_1_transformer", "model.pt")
+OGS3 = os.path.join(DATA, "OGS3_mRNA.fasta")
+MAXLEN = 640
+
+
+def load_model():
+    ck = torch.load(CKPT, map_location="cpu", weights_only=False)
+    cfg = ck["cfg"]; m = cfg["model"]
+    extra = FEATURE_DIM if cfg["data"].get("use_features", False) else 0
+    net = dsRNATransformer(dim=m["dim"], depth=m["depth"], heads=m["heads"],
+        mlp_ratio=m["mlp_ratio"], dropout=m["dropout"], max_len=MAXLEN,
+        num_lethality=1, num_topics=1, pool=m.get("pool", "mean"),
+        conv_stem=m.get("conv_stem", False), stem_kernel=m.get("stem_kernel", 9),
+        stem_layers=m.get("stem_layers", 2), stem_pool=m.get("stem_pool", 4),
+        extra_dim=extra)
+    net.load_state_dict(ck["model"]); net.eval()
+    return net, extra
+
+
+@torch.no_grad()
+def score(net, extra, seq):
+    ids, attn = encode_seq(seq, MAXLEN, 1)
+    feat = torch.from_numpy(compute_features(seq, MAXLEN)).unsqueeze(0) if extra else None
+    lo = net(ids.unsqueeze(0), attn.unsqueeze(0), feat)["lethality_logit"].squeeze().item()
+    return lo
+
+
+def read_fasta(path):
+    name, buf = None, []
+    for line in open(path):
+        line = line.rstrip()
+        if line.startswith(">"):
+            if name: yield "".join(buf)
+            name, buf = line, []
+        else: buf.append(line.upper())
+    if name: yield "".join(buf)
+
+
+def kmers(s, k=20):
+    return {s[i:i+k] for i in range(0, max(0, len(s)-k+1))}
+
+
+def main():
+    net, extra = load_model()
+
+    # ---- positives: 20 effective dsRNA ----
+    pos = []
+    for r in csv.DictReader(open(os.path.join(HERE, "ALL_clean_external_dsRNA_marked.csv"))):
+        if r["truth"] in ("eff", "eff(qual)"):
+            pos.append((r["paper"], r["gene"], r["seq"].upper()))
+    pos_lens = [len(s) for _, _, s in pos]
+    print(f"positives (effective dsRNA): {len(pos)}")
+
+    # ---- training negatives (for overlap exclusion) ----
+    train_neg_seqs, train_neg_km = set(), set()
+    for r in csv.DictReader(open(os.path.join(DATA, "manifest_binary.csv"))):
+        if r["label"] == "0":
+            s = r["seq"].upper(); train_neg_seqs.add(s); train_neg_km |= kmers(s)
+
+    # ---- negatives: 20 mRNA fragments, length-matched, train-excluded ----
+    transcripts = [s.replace("U", "T") for s in read_fasta(OGS3) if len(s) >= min(pos_lens)]
+    rng = random.Random(20260708)
+    neg = []
+    while len(neg) < len(pos):
+        L = rng.choice(pos_lens)
+        t = transcripts[rng.randrange(len(transcripts))]
+        if len(t) < L: continue
+        st = rng.randrange(0, len(t) - L + 1); frag = t[st:st + L]
+        if "N" in frag or frag in train_neg_seqs: continue
+        ks = kmers(frag)
+        if ks and len(ks & train_neg_km) / len(ks) >= 0.5: continue
+        neg.append(frag)
+    print(f"negatives (clean mRNA fragments): {len(neg)}\n")
+
+    # ---- score ----
+    pos_lo = [score(net, extra, s) for _, _, s in pos]
+    neg_lo = [score(net, extra, s) for s in neg]
+
+    tp = sum(1 for x in pos_lo if x > 0)     # dsRNA called effective
+    tn = sum(1 for x in neg_lo if x <= 0)    # mRNA called ineffective
+    fp = len(neg_lo) - tn
+    fn = len(pos_lo) - tp
+    n = len(pos_lo) + len(neg_lo)
+
+    # AUC
+    auc = sum((a > b) + 0.5 * (a == b) for a in pos_lo for b in neg_lo) / (len(pos_lo) * len(neg_lo))
+
+    print("=== effective dsRNA vs clean mRNA ===")
+    print(f"  dsRNA (pos) called effective:   {tp}/{len(pos_lo)} = {tp/len(pos_lo):.2f}")
+    print(f"  mRNA  (neg) called ineffective: {tn}/{len(neg_lo)} = {tn/len(neg_lo):.2f}")
+    print(f"  confusion: TP={tp} FN={fn} TN={tn} FP={fp}")
+    print(f"  overall accuracy = {(tp+tn)}/{n} = {(tp+tn)/n:.3f}")
+    print(f"  AUC = {auc:.3f}")
+
+    # write the paired set
+    out = os.path.join(HERE, "effective_vs_mRNA.csv")
+    with open(out, "w", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["class", "source", "gene", "length", "model_logit", "call", "seq"])
+        for (p, g, s), lo in zip(pos, pos_lo):
+            w.writerow(["dsRNA", p, g, len(s), round(lo, 3), "effective" if lo > 0 else "ineffective", s])
+        for i, (s, lo) in enumerate(zip(neg, neg_lo)):
+            w.writerow(["mRNA", "OGS3", f"frag_{i:02d}", len(s), round(lo, 3),
+                        "effective" if lo > 0 else "ineffective", s])
+    print(f"\nwrote {out}")
+
+
+if __name__ == "__main__":
+    main()

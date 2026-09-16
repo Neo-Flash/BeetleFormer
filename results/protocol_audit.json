@@ -1,0 +1,45 @@
+{
+  "sequence": {
+    "records": 29646,
+    "external_sequence_matches": 0,
+    "external_genes_in_training": [
+      "TC001752",
+      "TC002077",
+      "TC002415",
+      "TC002507",
+      "TC003392",
+      "TC003900",
+      "TC006375",
+      "TC006679",
+      "TC007435",
+      "TC008058",
+      "TC008129",
+      "TC008190",
+      "TC008518",
+      "TC009267",
+      "TC010678",
+      "TC011945",
+      "TC014774",
+      "TC030552",
+      "TC030579",
+      "TC032263",
+      "TC033074"
+    ],
+    "internal_gene_and_component_disjoint": true,
+    "initial_assignments_preserved": true
+  },
+  "gene": {
+    "records": 29603,
+    "external_sequence_matches": 0,
+    "external_genes_in_training": [],
+    "internal_gene_and_component_disjoint": true,
+    "initial_assignments_preserved": true
+  },
+  "edge_cases": {
+    "exact_and_reverse": true,
+    "bidirectional_containment": true,
+    "threshold_and_below_threshold": true,
+    "gene_sharing_alone_allowed": true,
+    "transitive_internal_groups": true
+  }
+}

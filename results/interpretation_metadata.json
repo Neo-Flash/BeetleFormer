@@ -1,0 +1,12 @@
+{
+  "seed": 20260911,
+  "base_preference_n_each": 750,
+  "saliency_n": 200,
+  "PCA_n": 1500,
+  "PCA_explained_variance": [
+    0.6968247890472412,
+    0.1909412294626236
+  ],
+  "saliency": "L2 norm of logit gradient on embeddings, two orientations aligned and added, normalized per sequence then interpolated to 50 relative-position bins and normalized again",
+  "checkpoint_epoch": 12
+}

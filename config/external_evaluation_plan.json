@@ -1,0 +1,18 @@
+{
+  "frozen_before_retraining": "2026-09-13T22:33:36.263010+00:00",
+  "external_sequences": 40,
+  "external_genes": "unique OGS3 source genes reconstructed from all original fragments",
+  "sequence_protocol": "Exclude modeling records with exact sequence identity, complete containment in either direction, or at least 50% of an external sequence's distinct 20-mers shared with one modeling record. Check both strands and both classes. Target-gene sharing alone is allowed.",
+  "gene_protocol": "Additionally exclude every modeling record assigned to any source gene of the original 40 external sequences, including background source genes.",
+  "internal_partition": "Assign source genes connected by the same 20-mer overlap rule to one component before splitting. Keep the initial partition fixed between external protocols.",
+  "models_sequence": "All seven configurations in experiment.json",
+  "models_gene": [
+    "beetleformer",
+    "cnn_bilstm"
+  ],
+  "selection": "All architecture, seed and optimizer settings retained from experiment.json; validation AUC alone selects checkpoints. No external label or score selects a model or hyperparameter.",
+  "reporting": "Binary classification on the unchanged original external panel. Report both isolation protocols, classification AUC, accuracy and confusion counts; no dsRIP 28-fragment ranking panel.",
+  "external_positive": 20,
+  "external_background": 20,
+  "external_source": "Unchanged original release_data/BeetleFormer_external_test.csv; four studies plus OGS3 controls"
+}

@@ -1,0 +1,76 @@
+{
+  "beetleformer": {
+    "n": 40,
+    "AUC": 0.9425,
+    "AP": 0.9405145420741396,
+    "Acc": 0.725,
+    "MCC": 0.4803844614152614,
+    "Sn": 0.55,
+    "Sp": 0.9,
+    "Precision": 0.8461538461538461,
+    "F1": 0.6666666666666666,
+    "TP": 11,
+    "TN": 18,
+    "FP": 2,
+    "FN": 9,
+    "AUC_gene_bootstrap_95CI": [
+      0.862485119047619,
+      1.0
+    ],
+    "threshold": 0.5,
+    "selected_epoch": 11,
+    "checkpoint_sha256": "904bb554c88211793a914fbfad0ca317e6a0e33290ea3041b9d07f4bf3fdd661"
+  },
+  "cnn_bilstm": {
+    "n": 40,
+    "AUC": 0.8624999999999999,
+    "AP": 0.8900054926701049,
+    "Acc": 0.8,
+    "MCC": 0.628970902033151,
+    "Sn": 0.65,
+    "Sp": 0.95,
+    "Precision": 0.9285714285714286,
+    "F1": 0.7647058823529411,
+    "TP": 13,
+    "TN": 19,
+    "FP": 1,
+    "FN": 7,
+    "AUC_gene_bootstrap_95CI": [
+      0.7479092261904762,
+      0.96
+    ],
+    "threshold": 0.5,
+    "selected_epoch": 11,
+    "checkpoint_sha256": "8cb88079c9c67ef93b68889529e9c56cf350df0b2d9af76192277a4aff94cc75"
+  },
+  "evaluation_protocol": "gene",
+  "external_n": 40,
+  "positive": 20,
+  "negative": 20,
+  "external_source_genes": 37,
+  "external_positive_genes": 17,
+  "source_counts": {
+    "OGS3": 20,
+    "Gaddelapati2024": 11,
+    "Cedden2025": 7,
+    "Knorr2018": 1,
+    "AbdElHalim2016": 1
+  },
+  "source_genes_shared_with_training": [],
+  "isolation": {
+    "external_genes": 37,
+    "external_sequences": 40,
+    "checked_modeling_sequences": 29603,
+    "sequence_matches": 0,
+    "genes_shared": [],
+    "require_gene_isolation": true,
+    "kmer_length": 20,
+    "external_kmer_fraction_threshold": 0.5,
+    "reverse_complements_checked": true,
+    "both_classes_checked": true
+  },
+  "split_sha256": "934267018933a9761cd5576a6a283f38b6e7ae8263fc36f7e44863559f9ca9b3",
+  "external_identity_sha256": "fbdd27af274ce27a74007f6421cc04e5223c5d126f6a3601f38befc9a1ea7a1b",
+  "original_source_sha256": "6860203d257c9815a111628e4bfc944f8951076d69545d4e4af54a6a56dfc30a",
+  "interpretation": "Binary candidate-prescreening evaluation using the unchanged original 20 dsRNA-positive and 20 mRNA-background sequences from four studies and OGS3; both isolation protocols use identical external labels and sequences; higher AUC indicates stronger positive/background discrimination."
+}

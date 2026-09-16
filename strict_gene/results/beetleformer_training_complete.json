@@ -1,0 +1,9 @@
+{
+  "seconds": 926.2838449478149,
+  "best_validation_AUC": 0.9748083620565847,
+  "params": 376226,
+  "device": "mps",
+  "steps": 1692,
+  "split_sha256": "934267018933a9761cd5576a6a283f38b6e7ae8263fc36f7e44863559f9ca9b3",
+  "evaluation_protocol": "gene"
+}

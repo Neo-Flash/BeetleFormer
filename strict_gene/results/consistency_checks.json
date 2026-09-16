@@ -1,0 +1,24 @@
+{
+  "evaluation_protocol": "gene",
+  "external_isolation": {
+    "external_genes": 37,
+    "external_sequences": 40,
+    "checked_modeling_sequences": 29603,
+    "sequence_matches": 0,
+    "genes_shared": [],
+    "require_gene_isolation": true,
+    "kmer_length": 20,
+    "external_kmer_fraction_threshold": 0.5,
+    "reverse_complements_checked": true,
+    "both_classes_checked": true
+  },
+  "source_gene_and_sequence_partitions_disjoint": true,
+  "reverse_complement_roundtrip": true,
+  "strand_symmetry_max_logit_difference": 0.0,
+  "padding_mask_max_logit_difference": 0.0,
+  "saved_prediction_max_absolute_difference": 4.76837158203125e-07,
+  "finite_gradients": true,
+  "model_parameters": 376226,
+  "test_sequences_checked": 64,
+  "split_sha256": "934267018933a9761cd5576a6a283f38b6e7ae8263fc36f7e44863559f9ca9b3"
+}

@@ -1,0 +1,23 @@
+{
+  "source_csv_preserved": true,
+  "external_sequences_and_labels_changed": false,
+  "notes": [
+    "Publication metadata for Gaddelapati et al. were verified against the publisher: Communications Biology 7, 521, DOI 10.1038/s42003-024-06212-7. The original CSV is preserved as an archival input even where its free-text reference field says 536.",
+    "Original external gene aliases are retained for traceability; unique OGS3 identifiers reconstructed by exact sequence containment are authoritative for gene isolation. The original alias TAF1 maps to TC015921, identified as NAA40 in the source paper. This does not change its sequence or binary label.",
+    "Original activity magnitudes, readout strings, model scores and model calls are not used as current experimental endpoints, predictions or selection criteria. The current external task is the original binary positive/background classification.",
+    "Two background queries completely contain or are contained within internal positive sequences; two others reach the fixed original 20-mer fraction threshold. None is an exact full-sequence duplicate. One affected internal record is training, two validation and one test. These internal records are excluded; the queries remain in the external panel.",
+    "The original external background sampler checked overlaps against internal negative-class sequences only. The four newly identified overlaps involve internal positive-class records. The revised check retains the original 50%-of-distinct-20-mers criterion while checking both internal classes and both orientations.",
+    "Supplementary Tables 1–3 identify TC008129 as NAA30 and TC008190 as NAA16. The original CSV assigns the approximately 60% mortality description to TC008129; the source article associates it with NAA16. This legacy magnitude is not used in the classification task.",
+    "All 11 retained Gaddelapati reagents were cross-referenced to published gene symbols and the cognate-dsRNA knockdown data in Figure 1A/Supplementary Data 2. For example, HAT1 shows target-transcript reduction despite relatively low mortality; binary positive status does not require every external reagent to have the same mortality endpoint."
+  ],
+  "published_evidence_files": {
+    "data/raw/original_external/source_evidence/42003_2024_6212_MOESM1_ESM.docx": {
+      "sha256": "acdaa17ce8510c91314b6b107bcd981936f3fe898b077e7b00a5cefd76be713c",
+      "publication_doi": "10.1038/s42003-024-06212-7"
+    },
+    "data/raw/original_external/source_evidence/42003_2024_6212_MOESM4_ESM.xlsx": {
+      "sha256": "9d0dec654c685a9afd2adb0fc06534f4c7cfd92c40201df18938f5f431c3f111",
+      "publication_doi": "10.1038/s42003-024-06212-7"
+    }
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "configuration": {
+    "seed": 20260911,
+    "split": {
+      "test_group_fraction": 0.2,
+      "validation_remaining_group_fraction": 0.25,
+      "second_seed": 20260912
+    },
+    "max_len": 640,
+    "epochs": 12,
+    "batch_size": 128,
+    "optimizer": "AdamW",
+    "learning_rate": 0.0003,
+    "weight_decay": 0.01,
+    "warmup_fraction": 0.1,
+    "gradient_clip": 1.0,
+    "cpu_threads": 6,
+    "checkpoint_selection": "maximum validation ROC AUC; earliest epoch breaks ties",
+    "models": {
+      "beetleformer": {
+        "label": "BeetleFormer",
+        "symmetric_features": true,
+        "parameters": {}
+      },
+      "without_strand_symmetry": {
+        "label": "Without strand symmetry",
+        "symmetric_features": false,
+        "parameters": {
+          "symmetric": false
+        }
+      },
+      "without_convolutions": {
+        "label": "Without local convolutions",
+        "symmetric_features": true,
+        "parameters": {
+          "local_convolutions": false
+        }
+      },
+      "without_descriptors": {
+        "label": "Without sequence descriptors",
+        "symmetric_features": true,
+        "parameters": {
+          "descriptors": false
+        }
+      },
+      "without_attention_pool": {
+        "label": "Without attention pooling",
+        "symmetric_features": true,
+        "parameters": {
+          "attention_pool": false
+        }
+      },
+      "single_scale_transformer": {
+        "label": "Single-scale Transformer",
+        "symmetric_features": false,
+        "parameters": {}
+      },
+      "cnn_bilstm": {
+        "label": "Adapted CNN\u2013BiLSTM",
+        "symmetric_features": false,
+        "parameters": {}
+      }
+    }
+  },
+  "requested_models": [
+    "beetleformer",
+    "cnn_bilstm"
+  ],
+  "split_sha256": "934267018933a9761cd5576a6a283f38b6e7ae8263fc36f7e44863559f9ca9b3",
+  "created_utc": "2026-09-14T00:05:37Z",
+  "evaluation_protocol": "gene",
+  "external_identity_sha256": "fbdd27af274ce27a74007f6421cc04e5223c5d126f6a3601f38befc9a1ea7a1b",
+  "note": "Architecture and optimizer fixed before this two-protocol retraining; external outcomes are never used for checkpoint selection or retuning."
+}
